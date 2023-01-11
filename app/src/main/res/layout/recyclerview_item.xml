@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="0dp"
+    android:layout_margin="0dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_margin="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/edit_round_corners1">
+
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:fontFeatureSettings=""
+            android:text="@string/ON_OFF"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:layout_editor_absoluteY="27dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/swControls"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:text="Settings"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_margin="8dp"
+        android:layout_width="0dp"
+        app:layout_constraintWidth_percent=".1"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewSample"
+        android:background="@drawable/edit_round_corners1"
+        app:layout_constraintTop_toTopOf="@id/viewControls"
+        app:layout_constraintBottom_toBottomOf="@id/viewControls"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text = ""
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"></TextView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:background="@android:color/transparent"
+            android:foregroundGravity="top"
+            android:gravity="top"
+            android:id="@+id/textView"
+            style="@style/word_title"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:enabled="false"
+            android:fontFamily="sans-serif-black"
+            android:text="Hello Word what do you think is happening here"
+            android:textSize="24sp"
+            android:textColor="@drawable/edit_text_selector"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintWidth_percent=".8"
+    android:id="@+id/viewControls"
+    android:background="@drawable/edit_round_corners1"
+    app:layout_constraintStart_toEndOf="@id/viewSample"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/switch1"
+    app:layout_constraintTop_toBottomOf="@id/textView">
+    <SeekBar
+        android:id="@+id/sbRed"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="@integer/max255"
+        android:progressTint="#EA1717"
+        android:thumbTint="#EA1717"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="48dp" />
+
+    <SeekBar
+        android:id="@+id/sbGreen"
+        android:layout_width="match_parent"
+        android:max="@integer/max255"
+        android:layout_height="50dp"
+        android:progressTint="#4CAF50"
+        android:thumbTint="#4CAF50"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sbRed"
+        tools:layout_editor_absoluteX="48dp" />
+
+
+    <SeekBar
+        android:id="@+id/sbBlue"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="@integer/max255"
+        android:progressTint="#2196F3"
+        android:thumbTint="#2196F3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sbGreen"
+        tools:layout_editor_absoluteX="48dp" />
+
+    <SeekBar
+        android:id="@+id/sbAlpha"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="@integer/max255"
+        android:progressTint="#DFF8F5F5"
+        android:thumbTint="#DFF8F5F5"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sbBlue"
+        tools:layout_editor_absoluteX="48dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
