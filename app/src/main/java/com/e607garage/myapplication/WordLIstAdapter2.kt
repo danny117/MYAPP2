@@ -12,19 +12,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
-import org.jetbrains.annotations.NonNls
 
 
 class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(WordsComparator()) {
     var updateWord: ((Word) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder2 {
-        return  WordViewHolder2.create(parent)
+        return WordViewHolder2.create(parent)
     }
 
-    override fun onViewRecycled(holder: WordViewHolder2) {
-        super.onViewRecycled(holder)
-    }
 
     override fun getItemViewType(position: Int): Int {
         super.getItemViewType(position)
@@ -33,35 +29,9 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
 
     override fun onBindViewHolder(holder: WordViewHolder2, position: Int) {
         val word = getItem(position)
-        holder.bind(word,updateWord)
-
-/*
-        sbRed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            */
-/*changes to screen are done here*//*
-
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {}
-            override fun onStartTrackingTouch(p0: SeekBar?) {}
-
-            */
-/* when finished then send update to database*//*
-
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-                if (p0 != null) {
-                    val word = getItem(holder.adapterPosition)
-                    word.color = Color.argb(
-                        sbAlpha.progress.toInt(),
-                        sbRed.progress.toInt(),
-                        sbGreen.progress.toInt(),
-                        sbBlue.progress.toInt()
-                    )
-                    updateWord?.invoke(word)
-                }
-            }
-        })
-*/
-
+        holder.bind(word, updateWord)
     }
+
 
 
     class WordViewHolder2(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -78,7 +48,7 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
         val sbAlpha: SeekBar = itemView.findViewById(R.id.sbAlpha)
         val sample: TextView = itemView.findViewById(R.id.textView2)
 
-        fun bind(word: Word,updateWord:  ((Word) -> Unit)?) {
+        fun bind(word: Word, updateWord: ((Word) -> Unit)?) {
             this.updateWord = updateWord
             this.word = word
             wordItemView.setText(word.word, TextView.BufferType.EDITABLE)
@@ -107,7 +77,7 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
                     sbAlpha.visibility = View.GONE
                     var t = wordItemView.text
                     if (t != null) {
-                        if( !t.equals(word.word)){
+                        if (!t.equals(word.word)) {
                             word.word = t.toString()
                             updateWord?.invoke(word)
                         }
@@ -151,8 +121,7 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
             sbGreen.setOnSeekBarChangeListener(getListener())
             sbBlue.setOnSeekBarChangeListener(getListener())
             sbAlpha.setOnSeekBarChangeListener(getListener())
-            getListener().onProgressChanged(sbRed,0,false)
-
+            getListener().onProgressChanged(sbRed, 0, false)
 
 
         }
@@ -170,11 +139,14 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
 
     class WordsComparator : DiffUtil.ItemCallback<Word>() {
         override fun areItemsTheSame(oldItem: Word, newItem: Word): Boolean {
-            return oldItem === newItem
+            return (oldItem._id == newItem._id
+                    && oldItem.checked == newItem.checked
+                    && oldItem.word == newItem.word
+                    && oldItem.color == newItem.color)
         }
 
         override fun areContentsTheSame(oldItem: Word, newItem: Word): Boolean {
-            return oldItem.word == newItem.word
+            return oldItem._id == newItem._id
         }
     }
 

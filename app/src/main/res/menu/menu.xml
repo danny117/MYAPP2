@@ -7,18 +7,18 @@
         android:id="@+id/action_bluetooth"
         android:icon="@drawable/ic_baseline_bluetooth_24"
         android:title="Bluetooth"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/RemoveLIght"
         android:title="Remove Last Light"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="never"></item>
 
 
     <item
         android:id="@+id/AddLIght"
         android:title="Add Light"
-        app:showAsAction="ifRoom"></item>
+        app:showAsAction="never"></item>
 
     <!-- Settings, should always be in the overflow -->
     <item

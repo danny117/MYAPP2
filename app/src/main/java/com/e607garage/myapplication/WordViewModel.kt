@@ -11,10 +11,7 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
     // - Repository is completely separated from the UI through the ViewModel.
     val allWords: LiveData<List<Word>> = repository.allWords.asLiveData()
 
-    /**
-     * Launching a new coroutine to insert the data in a non-blocking way
-     */
-    fun insert(word: Word) = viewModelScope.launch {
+    suspend fun insert(word: Word) {
         repository.insert(word)
     }
 
