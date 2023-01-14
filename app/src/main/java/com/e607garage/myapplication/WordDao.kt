@@ -27,9 +27,9 @@ interface WordDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(word: Word)
 
-    @Query("DELETE FROM word_table")
-    suspend fun deleteAll()
-
-    @Update()
+    @Update
     suspend fun update(word: Word)
+
+    @Query("delete from word_table where _id = (select max(_id) from word_table)")
+    suspend fun removeLast()
 }

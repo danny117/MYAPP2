@@ -4,10 +4,10 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -33,15 +33,13 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
     }
 
 
-
     class WordViewHolder2(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private lateinit var word: Word
         private var updateWord: ((Word) -> Unit)? = null
 
-        val wordItemView: AppCompatEditText = itemView.findViewById(R.id.textView)
-        val wordItemSwitch: SwitchMaterial = itemView.findViewById(R.id.switch1)
-        val swControls: SwitchMaterial = itemView.findViewById(R.id.swControls)
-        val viewControls: ConstraintLayout = itemView.findViewById(R.id.viewControls)
+        private val wordItemView: AppCompatEditText = itemView.findViewById(R.id.textView)
+        private val wordItemSwitch: SwitchMaterial = itemView.findViewById(R.id.switch1)
+        private val swControls: SwitchMaterial = itemView.findViewById(R.id.swControls)
         val sbRed: SeekBar = itemView.findViewById(R.id.sbRed)
         val sbGreen: SeekBar = itemView.findViewById(R.id.sbGreen)
         val sbBlue: SeekBar = itemView.findViewById(R.id.sbBlue)
@@ -55,14 +53,12 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
             wordItemView.isEnabled = false
 
             wordItemSwitch.isChecked = word.checked
-            wordItemSwitch.setOnClickListener {
-                val jx = it as SwitchMaterial
-                word.checked = jx.isChecked
+            wordItemSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+                word.checked = b
                 updateWord?.invoke(word)
             }
-            swControls.setOnClickListener {
-                val jx = it as SwitchMaterial
-                if (jx.isChecked) {
+            fun doChange(b: Boolean) {
+                if (b) {
                     wordItemView.isEnabled = true
                     wordItemView.requestFocus()
                     sbRed.visibility = View.VISIBLE
@@ -75,7 +71,7 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
                     sbGreen.visibility = View.GONE
                     sbBlue.visibility = View.GONE
                     sbAlpha.visibility = View.GONE
-                    var t = wordItemView.text
+                    val t = wordItemView.text
                     if (t != null) {
                         if (!t.equals(word.word)) {
                             word.word = t.toString()
@@ -84,7 +80,10 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
                     }
                 }
             }
-            swControls.callOnClick()
+            swControls.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
+                doChange(b)
+            }
+            doChange(swControls.isChecked)
             sbRed.progress = Color.red(word.color)
             sbGreen.progress = Color.green(word.color)
             sbBlue.progress = Color.blue(word.color)
@@ -93,7 +92,7 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
             fun getListener() = object : SeekBar.OnSeekBarChangeListener {
                 /*changes to screen are done here*/
                 override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                    var color = Color.argb(
+                    val color = Color.argb(
                         sbAlpha.progress,
                         sbRed.progress,
                         sbGreen.progress,
@@ -139,17 +138,17 @@ class WordListAdapter2 : ListAdapter<Word, WordListAdapter2.WordViewHolder2>(Wor
 
     class WordsComparator : DiffUtil.ItemCallback<Word>() {
         override fun areItemsTheSame(oldItem: Word, newItem: Word): Boolean {
+            //the same item has the same id
+            return (oldItem._id == newItem._id)
+        }
+
+        override fun areContentsTheSame(oldItem: Word, newItem: Word): Boolean {
             return (oldItem._id == newItem._id
                     && oldItem.checked == newItem.checked
                     && oldItem.word == newItem.word
                     && oldItem.color == newItem.color)
         }
-
-        override fun areContentsTheSame(oldItem: Word, newItem: Word): Boolean {
-            return oldItem._id == newItem._id
-        }
     }
-
 
 }
 

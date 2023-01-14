@@ -30,10 +30,10 @@ public abstract class WordRoomDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    var wordDao = database.wordDao()
+                    val wordDao = database.wordDao()
 
                     // Delete all content here.
-                    wordDao.deleteAll()
+                    //wordDao.deleteAll()
 
                     // Add sample words.
                     // TODO: Add your own words!

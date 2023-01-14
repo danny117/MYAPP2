@@ -24,4 +24,9 @@ class WordRepository(private val wordDao: WordDao) {
     suspend fun update(word: Word) {
         wordDao.update(word)
     }
+
+    @WorkerThread
+    suspend fun removeLast() {
+        wordDao.removeLast()
+    }
 }

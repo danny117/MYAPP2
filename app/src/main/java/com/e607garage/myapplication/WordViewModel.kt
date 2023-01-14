@@ -1,7 +1,6 @@
 package com.e607garage.myapplication
 
 import androidx.lifecycle.*
-import kotlinx.coroutines.launch
 
 class WordViewModel(private val repository: WordRepository) : ViewModel() {
 
@@ -17,6 +16,10 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
 
     suspend fun update(word: Word) {
         repository.update(word)
+    }
+
+    suspend fun removeLast() {
+        repository.removeLast()
     }
 }
 
