@@ -32,4 +32,7 @@ interface WordDao {
 
     @Query("delete from word_table where _id = (select max(_id) from word_table)")
     suspend fun removeLast()
+
+    @Query("select count(*) from word_table")
+    fun getNumberLights(): Flow<Int>
 }

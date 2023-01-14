@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.get
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,12 +48,17 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getLayoutManager(myAppContext: Context) = object : LinearLayoutManager(myAppContext){
-        override fun onItemsAdded(recyclerView: RecyclerView, positionStart: Int, itemCount: Int) {
-            super.onItemsAdded(recyclerView, positionStart, itemCount)
-            this.scrollToPosition(positionStart)
+    private fun getLayoutManager(myAppContext: Context) =
+        object : LinearLayoutManager(myAppContext) {
+            override fun onItemsAdded(
+                recyclerView: RecyclerView,
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                super.onItemsAdded(recyclerView, positionStart, itemCount)
+                this.scrollToPosition(positionStart)
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = getLayoutManager(this)
         recyclerView.itemAnimator = null
 
+
         // Add an observer on the LiveData returned by getAlphabetizedWords.
         // The onChanged() method fires when the observed data changes and the activity is
         val observer: Observer<List<Word>> =
@@ -75,11 +82,17 @@ class MainActivity : AppCompatActivity() {
 
         wordViewModel.allWords.observe(this, observer)
 
+        val numLightsObserver: Observer<Int> = Observer { i: Int ->
+            i.let { jx.setTitle(i.toString()) }
+        }
+        wordViewModel.numLights.observe(this, numLightsObserver)
+
         adapter.updateWord = { word ->
             wordViewModel.viewModelScope.launch {
                 wordViewModel.update(word)
             }
         }
+
     }
 
 
