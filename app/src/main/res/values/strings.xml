@@ -5,4 +5,12 @@
     <string name="empty_not_saved">Word not saved because it is empty.</string>
     <string name="add_word">Add word</string>
     <string name="ON_OFF">ON OFF</string>
+    <string name="bluetooth_access_required">Please allow this app to bluetooth to light string</string>
+    <string name="bluetooth_permission_not_available">bluetooth is required to access the light string</string>
+    <string name="permission_granted">You its official we have a permit to operate here</string>
+    <string name="permission_required">If I could get a allow permit for the app please.</string>
+    <string name="ok">OK</string>
+    <string name="settings">Settings</string>
+    <string name="syncing_light_chain">Syncing light chain...</string>
+    <string name="syncing_light_chain_updated">Synced</string>
 </resources>

@@ -23,4 +23,9 @@
         <item name="android:background">@android:color/holo_orange_light</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
     </style>
+
+    <style name="ButtonStyle2" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="thumbTint">@drawable/custom_thumb_selector</item>
+    </style>
+
 </resources>

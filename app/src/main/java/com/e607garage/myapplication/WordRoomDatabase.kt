@@ -10,35 +10,46 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = arrayOf(Word::class), version = 6, exportSchema = true, autoMigrations = [
+    entities = arrayOf(Word::class, Bluetooth::class)
+    , version = 10, exportSchema = true, autoMigrations = [
         AutoMigration(from = 2, to = 3)
         , AutoMigration(from = 3, to = 4)
         , AutoMigration(from = 4, to = 5)
         , AutoMigration(from = 5, to = 6)
+        , AutoMigration(from = 6, to = 7)
+        , AutoMigration(from = 7, to = 8)
+        , AutoMigration(from = 8, to = 9)
+        , AutoMigration(from = 9, to = 10)
     ]
 )
 
-public abstract class WordRoomDatabase : RoomDatabase() {
+abstract class WordRoomDatabase : RoomDatabase() {
 
     abstract fun wordDao(): WordDao
 
     private class WordDatabaseCallback(
         private val scope: CoroutineScope
-    ) : RoomDatabase.Callback() {
+    ) : Callback() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
+
+
                     val wordDao = database.wordDao()
+
+                    val bluetooth = Bluetooth(true, _id = 0)
+                    wordDao.insert(bluetooth)
 
                     // Delete all content here.
                     //wordDao.deleteAll()
 
                     // Add sample words.
                     // TODO: Add your own words!
-                    var word = Word("My First Light in the chain")
+                    val word = Word("My First Light in the chain")
                     wordDao.insert(word)
+
                 }
             }
         }

@@ -16,23 +16,24 @@
 
 
         <com.google.android.material.switchmaterial.SwitchMaterial
+            style="@style/ButtonStyle2"
             android:id="@+id/switch1"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:fontFeatureSettings=""
+            android:layout_height="48dp"
             android:text="@string/ON_OFF"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            tools:layout_editor_absoluteY="27dp" />
+            app:layout_constraintLeft_toRightOf="@id/swControls"
+            app:layout_constraintRight_toRightOf="parent" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
+           style="@style/ButtonStyle2"
             android:id="@+id/swControls"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:text="Settings"
+            android:layout_height="48dp"
+            android:text="@string/settings"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/switch1"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,12 +51,11 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
             android:text = ""
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"></TextView>
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -65,13 +65,13 @@
             android:background="@android:color/transparent"
             android:foregroundGravity="top"
             android:gravity="top"
+            android:text="This is a light in the chain"
             android:id="@+id/textView"
             style="@style/word_title"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:enabled="false"
             android:fontFamily="sans-serif-black"
-            android:text="Hello Word what do you think is happening here"
             android:textSize="24sp"
             android:textColor="@drawable/edit_text_selector"
             app:layout_constraintStart_toStartOf="parent"
@@ -138,9 +138,20 @@
         app:layout_constraintTop_toBottomOf="@id/sbBlue"
         tools:layout_editor_absoluteX="48dp" />
 
+    <TextView
+        android:id="@+id/Update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/syncing_light_chain"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

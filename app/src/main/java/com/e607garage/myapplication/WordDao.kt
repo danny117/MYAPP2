@@ -35,4 +35,13 @@ interface WordDao {
 
     @Query("select count(*) from word_table")
     fun getNumberLights(): Flow<Int>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(bluetooth: Bluetooth)
+
+    @Query("Select intenabled from bluetooth_table where _id = 0")
+    fun getBluetoothEnabled(): Flow<List<Int>>
+
+    @Query("Select * from word_table where _id = :id")
+    suspend fun  getWord(id: Int) : Word
 }

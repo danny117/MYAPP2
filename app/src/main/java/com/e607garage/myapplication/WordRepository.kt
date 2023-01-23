@@ -7,9 +7,8 @@ import kotlinx.coroutines.flow.Flow
 // instead of the whole database, because you only need access to the DAO
 class WordRepository(private val wordDao: WordDao) {
 
-
-
     val numLights: Flow<Int> = wordDao.getNumberLights()
+
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -33,4 +32,11 @@ class WordRepository(private val wordDao: WordDao) {
     suspend fun removeLast() {
         wordDao.removeLast()
     }
+
+    @WorkerThread
+    suspend fun getWord(id: Int): Word {
+        return wordDao.getWord(id)
+    }
+
+
 }

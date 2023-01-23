@@ -9,7 +9,6 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
     val allWords: LiveData<List<Word>> = repository.allWords.asLiveData()
-    val numLights: LiveData<Int> = repository.numLights.asLiveData()
 
     suspend fun insert(word: Word) {
         repository.insert(word)
@@ -22,6 +21,8 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
     suspend fun removeLast() {
         repository.removeLast()
     }
+
+    suspend fun getWord(i: Int): Word = repository.getWord(i)
 }
 
 class WordViewModelFactory(private val repository: WordRepository) : ViewModelProvider.Factory {

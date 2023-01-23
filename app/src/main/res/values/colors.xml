@@ -10,6 +10,8 @@
     <color name="buttonLabel">#FFFFFF</color>
     <color name="enabled_color">#FFFEFF</color>
     <color name="disabled_color">#000000</color>
+    <color name="customUnchecked">#3A302F</color>
+    <color name="customChecked">#CDDC39</color>
 
 
 </resources>
