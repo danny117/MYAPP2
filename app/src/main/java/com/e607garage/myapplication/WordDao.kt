@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WordDao {
-
+    // still green going to commit again
     // The flow always holds/caches latest version of data. Notifies its observers when the
     // data has changed.
     @Query("SELECT * FROM word_table ORDER BY _id ASC")
