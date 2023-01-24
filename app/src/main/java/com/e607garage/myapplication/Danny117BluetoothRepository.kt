@@ -35,11 +35,40 @@ class Danny117BluetoothRepository(
     fun fetchLatestReply() {
         CoroutineScope(Dispatchers.IO).launch {
             val byteArray = ByteArray(16)
+            var offset = 0
+            var length = 16
             val bx = getMyInputStream()
             if (bx != null) {
                 var cx = 0
                 while (cx != -1) {
-                    cx = bx.read(byteArray)
+                    //buffer out of alignment
+                    if (cx == 16) {
+                        // find the markers and start over
+                        cx = 0
+                        offset = 0
+                        length = 16
+                    }
+                    //normal multi read
+                    if (cx in 1..15) {
+                        length = 16 - cx
+                        offset = cx
+                    }
+                    try {
+                        cx = bx.read(byteArray, offset, length)
+                    } catch (e: java.lang.Exception) {
+                        Log.e("DANNY117", e.toString())
+                        Log.e("DANNY117", offset.toString())
+                        Log.e("DANNY117", length.toString())
+                        Log.e("DANNY117", cx.toString())
+                        length = 16
+                        offset = 0
+                        cx = 0
+                    }
+                    //get out of here
+                    if (cx == -1) {
+                        break
+                    }
+                    cx += offset
                     //simple is it my data or garbage
                     // 16 bytes
                     // byte 0 marker 232
@@ -59,22 +88,25 @@ class Danny117BluetoothRepository(
                     // byte 14 marker 34
                     // byte 15 marker 182
                     if (cx == 16
-                        && byteArray[0].toInt() == 232
-                        && byteArray[1].toInt() == 34
-                        && byteArray[2].toInt() == 182
-                        && byteArray[13].toInt() == 232
-                        && byteArray[14].toInt() == 34
-                        && byteArray[15].toInt() == 182
+                        && byteArray[0].toUByte() == 232.toUByte()
+                        && byteArray[1].toUByte() == 34.toUByte()
+                        && byteArray[2].toUByte() == 182.toUByte()
+                        && byteArray[13].toUByte() == 232.toUByte()
+                        && byteArray[14].toUByte() == 34.toUByte()
+                        && byteArray[15].toUByte() == 182.toUByte()
                     ) {
+                        cx = 0
+                        offset = 0
+                        length = 16
                         val i = read4BytesFromBuffer(byteArray, 3)
                         val w: Word = wordViewModel.getWord(i)
                         if (w._id != 0) {
-                            w.rechecked = (byteArray[5].toInt() == 0)
-                            w.color = Color.argb(
-                                byteArray[6].toInt(),
-                                byteArray[7].toInt(),
-                                byteArray[8].toInt(),
-                                byteArray[9].toInt()
+                            w.rechecked = (byteArray[7].toInt() != 0)
+                            w.recolor = Color.argb(
+                                byteArray[8].toUByte().toInt(),
+                                byteArray[9].toUByte().toInt(),
+                                byteArray[10].toUByte().toInt(),
+                                byteArray[11].toUByte().toInt()
                             )
                             //finally update the word
                             wordViewModel.update(w)
@@ -166,7 +198,7 @@ class Danny117BluetoothRepository(
                 // byte 8 color alpha
                 // byte 9 color red
                 // byte 10 color green
-                // byte 12 color blue
+                // byte 11 color blue
                 // byte 12 modes
                 // byte 13 marker 232
                 // byte 14 marker 34

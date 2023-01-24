@@ -77,38 +77,39 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
             }
         }
 
-        fun getListener(wordViewModel: WordViewModel) = object : SeekBar.OnSeekBarChangeListener {
-            /*changes to screen are done immediately here*/
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                val color = Color.argb(
-                    sbAlpha.progress,
-                    sbRed.progress,
-                    sbGreen.progress,
-                    sbBlue.progress
-                )
-                sample.setBackgroundColor(color)
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {}
-
-            /* when finished then send update to database*/
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-                word.color = Color.argb(
-                    sbAlpha.progress,
-                    sbRed.progress,
-                    sbGreen.progress,
-                    sbBlue.progress
-                )
-                setTVSync()
-                scope.launch {
-                    wordViewModel.update(word)
-                }
-            }
-        }
-
 
         fun bind(word: Word, wordViewModel: WordViewModel, danny117BluetoothRepository: Danny117BluetoothRepository) {
-            //this.updateWord = updateWord
+
+            fun getListener(wordViewModel: WordViewModel) = object : SeekBar.OnSeekBarChangeListener {
+                /*changes to screen are done immediately here*/
+                override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                    val color = Color.argb(
+                        sbAlpha.progress,
+                        sbRed.progress,
+                        sbGreen.progress,
+                        sbBlue.progress
+                    )
+                    sample.setBackgroundColor(color)
+                }
+
+                override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+                /* when finished then send update to database*/
+                override fun onStopTrackingTouch(p0: SeekBar?) {
+                    word.color = Color.argb(
+                        sbAlpha.progress,
+                        sbRed.progress,
+                        sbGreen.progress,
+                        sbBlue.progress
+                    )
+                    setTVSync()
+                    scope.launch {
+                        wordViewModel.update(word)
+                    }
+                    danny117BluetoothRepository.writeB(word)
+                }
+            }
+
             this.word = word
             wordItemView.setText(word.word, TextView.BufferType.EDITABLE)
             wordItemView.isEnabled = false
@@ -119,6 +120,7 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
                             scope.launch {
                                 wordViewModel.update(word)
                             }
+                            danny117BluetoothRepository.writeB(word)
                         }
                         true
                     }
@@ -143,6 +145,7 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
                         scope.launch {
                             wordViewModel.update(word)
                         }
+                        danny117BluetoothRepository.writeB(word)
                     }
                 }
             }
@@ -156,6 +159,8 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
             sbBlue.setOnSeekBarChangeListener(getListener(wordViewModel))
             sbAlpha.setOnSeekBarChangeListener(getListener(wordViewModel))
             setTVSync()
+
+
 
         }
 
