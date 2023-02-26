@@ -3,6 +3,8 @@
 // I rename this .ino and compile and upload with Arduino IDE
 // I'm using an ESP32 Pico D4 official Espressif board it works great!
 //
+// just added mode 6 marquee to blink
+
 
 #include <Arduino.h>
 #include <BluetoothSerial.h>
@@ -40,10 +42,11 @@ class Modus {
 private:
   int count = 0;  //leds with animations
   Ledxerlate lx[MAX_LEDLEX];
+  int marquee_long = 1000;   // changes based on lights in marquee
+  int marquee_short = 125;  // time the light is off
 public:
   Modus() {
   }
-
 
   void tick(long millis) {
     bool hasChange = false;
@@ -51,22 +54,14 @@ public:
       //something to happen time has expired
       if (lx[k].millis < millis) {
         hasChange = true;
-        Serial.print("Cnt ");
-        Serial.print(count);
-        Serial.print(" Pos ");
-        Serial.print(lx[k].pos);
-        Serial.print(" M ");
-        Serial.print(millis);
-        Serial.print(" Trg ");
-        Serial.print(lx[k].millis);
-
         switch (lx[k].mode) {
           case 1:  //blink its where we start
           case 2:  //blink a bit faster
           case 3:  //blink a bit faster
           case 4:  //blink a bit faster
           case 5:  //yet another blink 3 fast then off for a second
-            doBlink(k);
+          case 6:  //marquee yet another blink
+            doBlink(k, millis);
             break;
         }
       }
@@ -76,7 +71,15 @@ public:
     }
   }
 
-  void doBlink(byte cpos) {
+  void doBlink(byte cpos, long millis) {
+    Serial.print(" Cnt ");
+    Serial.print(count);
+    Serial.print(" Pos ");
+    Serial.print(lx[cpos].pos);
+    Serial.print(" M ");
+    Serial.print(millis);
+    Serial.print(" Trg ");
+    Serial.print(lx[cpos].millis);
     switch (lx[cpos].step) {
       case 0:  //turn on led
         leds[lx[cpos].pos] = CRGB(lx[cpos].red, lx[cpos].green, lx[cpos].blue);
@@ -88,6 +91,15 @@ public:
         leds[lx[cpos].pos].fadeToBlackBy(255);
         lx[cpos].step = 0;
         break;
+    }
+
+    // mode 6 has varying durations
+    if (lx[cpos].mode == 6) {
+      if (lx[cpos].step == 0) {
+        lx[cpos].duration = marquee_short;
+      } else {
+        lx[cpos].duration = marquee_long;
+      }
     }
     //mode 5 has varrying durations
     if (lx[cpos].mode == 5) {
@@ -124,7 +136,8 @@ public:
   }
 
   //for debugging
-  void printit(int x) {
+  void
+  printit(int x) {
     Serial.print("Step=");
     Serial.print(x);
     Serial.print(" count=");
@@ -137,8 +150,7 @@ public:
     }
   }
 
-  void
-  startMode(long m, int pos, int mode, int alpha, int red, int green, int blue) {
+  void startMode(long m, int pos, int mode, int alpha, int red, int green, int blue) {
     printit(1);
     endMode(pos);
     if (mode != 0) {
@@ -166,6 +178,48 @@ public:
             break;
           case 5:
             lx[count].duration = 2500;  //assume we burn off 0 millies
+            break;
+          case 6:
+            //sort the marquee entries
+            int c6 = 1;
+            for (int k = 0; k < count; k++) {
+              Serial.print(k);
+              Serial.print(" ");
+              if (lx[k].mode == 6) {
+                Serial.println(" ");
+                c6 += 1;
+                for (int j = k + 1; j < count + 1; j++) {
+                  if (lx[j].mode == 6) {
+                    if (lx[j].pos < lx[k].pos) {
+                      Ledxerlate lxtemp = lx[k];
+                      lx[k] = lx[j];
+                      lx[j] = lxtemp;
+                    }
+                  }
+                }
+              }
+            }
+            marquee_long = marquee_short * c6;
+            bool hasMarquee = false;
+            long mx = m + marquee_short;
+            for (int k = 0; k < count + 1; k++) {
+              if (lx[k].mode == 6) {
+                Serial.print(" sorted ");
+                Serial.print(k);
+                if (!hasMarquee) {
+                  lx[k].step = 0;
+                  lx[k].millis = mx;
+                  lx[k].duration = marquee_short;
+                  hasMarquee = true;
+                } else {
+                  lx[k].millis = mx;
+                  lx[k].step = 1;
+                  lx[k].duration = marquee_long;
+                  mx += marquee_short;
+                }
+                Serial.println("1x");
+              }
+            }
             break;
         }
         count++;
@@ -199,7 +253,6 @@ Modus xm;
 void setup() {
 
   mySerial.begin("Danny117HDWS2812B");
-  //Turn this off when not needed...
   Serial.begin(57600);
 
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -284,4 +337,3 @@ void loop() {
   //tick the Modus this does blinks and fades and such
   xm.tick(m);
 }
-

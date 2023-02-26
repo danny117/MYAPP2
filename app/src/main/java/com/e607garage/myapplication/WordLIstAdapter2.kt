@@ -50,7 +50,7 @@ class WordListAdapter2(
         val sbBlue: SeekBar = itemView.findViewById(R.id.sbBlue)
         val sbAlpha: SeekBar = itemView.findViewById(R.id.sbAlpha)
         val sample: TextView = itemView.findViewById(R.id.textView2)
-        private var items: Array<String> = arrayOf("Normal", "Blink 1000", "Blink 750", "Blink 500", "Blink 250", "Blink 3")
+        private var items: Array<String> = arrayOf("Normal", "Blink 1000", "Blink 750", "Blink 500", "Blink 250", "Blink 3", "Marquee 1")
         private var adapter: ArrayAdapter<String> =
             ArrayAdapter<String>(
                 itemView.context,
