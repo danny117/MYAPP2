@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = arrayOf(Word::class, Bluetooth::class)
-    , version = 10, exportSchema = true, autoMigrations = [
+    , version = 12, exportSchema = true, autoMigrations = [
         AutoMigration(from = 2, to = 3)
         , AutoMigration(from = 3, to = 4)
         , AutoMigration(from = 4, to = 5)
@@ -20,6 +20,8 @@ import kotlinx.coroutines.launch
         , AutoMigration(from = 7, to = 8)
         , AutoMigration(from = 8, to = 9)
         , AutoMigration(from = 9, to = 10)
+        , AutoMigration(from = 10, to = 11)
+        , AutoMigration(from = 11, to = 12)
     ]
 )
 
@@ -39,8 +41,8 @@ abstract class WordRoomDatabase : RoomDatabase() {
 
                     val wordDao = database.wordDao()
 
-                    val bluetooth = Bluetooth(true, _id = 0)
-                    wordDao.insert(bluetooth)
+                    //val bluetooth = Bluetooth(true, _id = 0)
+                    //wordDao.insert(bluetooth)
 
                     // Delete all content here.
                     //wordDao.deleteAll()

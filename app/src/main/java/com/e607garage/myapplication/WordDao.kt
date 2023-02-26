@@ -34,7 +34,7 @@ interface WordDao {
     suspend fun removeLast()
 
     @Query("select count(*) from word_table")
-    fun getNumberLights(): Flow<Int>
+    suspend fun getNumberLights(): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(bluetooth: Bluetooth)

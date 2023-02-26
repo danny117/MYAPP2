@@ -38,7 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun addItem() {
         wordViewModel.viewModelScope.launch {
-            wordViewModel.insert(Word("Here is the new light"))
+            val word = Word("Here is the new light")
+            word._id = wordViewModel.getLightCount()
+            wordViewModel.insert(word)
         }
     }
 

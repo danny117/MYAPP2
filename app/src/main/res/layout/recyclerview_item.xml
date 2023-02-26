@@ -89,6 +89,16 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toTopOf="@id/switch1"
     app:layout_constraintTop_toBottomOf="@id/textView">
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/spinner"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:spinnerMode="dropdown"
+        android:layout_height="50dp">
+
+    </androidx.appcompat.widget.AppCompatSpinner>
     <SeekBar
         android:id="@+id/sbRed"
         android:layout_width="match_parent"
@@ -98,7 +108,7 @@
         android:thumbTint="#EA1717"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spinner"
         tools:layout_editor_absoluteX="48dp" />
 
     <SeekBar
@@ -138,20 +148,26 @@
         app:layout_constraintTop_toBottomOf="@id/sbBlue"
         tools:layout_editor_absoluteX="48dp" />
 
-    <TextView
-        android:id="@+id/Update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/syncing_light_chain"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <TextView
+            android:id="@+id/Update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rotation="-12"
+            android:rotationX="-4"
+            android:rotationY="37"
+            android:text="@string/syncing_light_chain"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/viewControls"
+            app:layout_constraintHorizontal_bias="0.23"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </LinearLayout>

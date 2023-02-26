@@ -6,9 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.CompoundButton
-import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -19,13 +18,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class WordListAdapter2(private var wordViewModel: WordViewModel,private val danny117BluetoothRepository: Danny117BluetoothRepository) :
+class WordListAdapter2(
+    private var wordViewModel: WordViewModel,
+    private val danny117BluetoothRepository: Danny117BluetoothRepository
+) :
     ListAdapter<Word, WordListAdapter2.WordViewHolder2>(WordsComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder2 {
         return WordViewHolder2.create(parent)
     }
 
+    //might not need this
     override fun getItemViewType(position: Int): Int {
         super.getItemViewType(position)
         return 12
@@ -33,7 +36,7 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
 
     override fun onBindViewHolder(holder: WordViewHolder2, position: Int) {
         val word = getItem(position)
-        holder.bind(word, wordViewModel, danny117BluetoothRepository )
+        holder.bind(word, wordViewModel, danny117BluetoothRepository)
     }
 
     class WordViewHolder2(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -47,16 +50,28 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
         val sbBlue: SeekBar = itemView.findViewById(R.id.sbBlue)
         val sbAlpha: SeekBar = itemView.findViewById(R.id.sbAlpha)
         val sample: TextView = itemView.findViewById(R.id.textView2)
+        private var items: Array<String> = arrayOf("Normal", "Blink 1000", "Blink 750", "Blink 500", "Blink 250", "Blink 3")
+        private var adapter: ArrayAdapter<String> =
+            ArrayAdapter<String>(
+                itemView.context,
+                com.google.android.material.R.layout.support_simple_spinner_dropdown_item, items
+            )
+
+
+        var spinner: Spinner = itemView.findViewById(R.id.spinner)
+
         private val tvSync: TextView = itemView.findViewById(R.id.Update)
 
-        private fun setTVSync() {
-            if (word.color == word.recolor && word.checked == word.rechecked) {
+        private fun setTVSync(): Boolean {
+            if (word.color == word.recolor && word.checked == word.rechecked && word.mode == word.remode) {
                 tvSync.text = ""
-                tvSync.visibility = View.GONE
+                tvSync.visibility = View.INVISIBLE
+                return true
             } else {
                 tvSync.visibility = View.VISIBLE
                 //getText(R.string.syncing_light_chain)
                 tvSync.text = "Syncing to light chain..."
+                return false
             }
         }
 
@@ -68,100 +83,111 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
                 sbGreen.visibility = View.VISIBLE
                 sbBlue.visibility = View.VISIBLE
                 sbAlpha.visibility = View.VISIBLE
+                spinner.visibility = View.VISIBLE
             } else {
                 wordItemView.isEnabled = false
                 sbRed.visibility = View.GONE
                 sbGreen.visibility = View.GONE
                 sbBlue.visibility = View.GONE
                 sbAlpha.visibility = View.GONE
+                spinner.visibility = View.GONE
             }
         }
 
 
-        fun bind(word: Word, wordViewModel: WordViewModel, danny117BluetoothRepository: Danny117BluetoothRepository) {
-
-            fun getListener(wordViewModel: WordViewModel) = object : SeekBar.OnSeekBarChangeListener {
-                /*changes to screen are done immediately here*/
-                override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                    val color = Color.argb(
-                        sbAlpha.progress,
-                        sbRed.progress,
-                        sbGreen.progress,
-                        sbBlue.progress
-                    )
-                    sample.setBackgroundColor(color)
-                }
-
-                override fun onStartTrackingTouch(p0: SeekBar?) {}
-
-                /* when finished then send update to database*/
-                override fun onStopTrackingTouch(p0: SeekBar?) {
-                    word.color = Color.argb(
-                        sbAlpha.progress,
-                        sbRed.progress,
-                        sbGreen.progress,
-                        sbBlue.progress
-                    )
-                    setTVSync()
-                    scope.launch {
-                        wordViewModel.update(word)
-                    }
-                    danny117BluetoothRepository.writeB(word)
+        fun bind(
+            word: Word,
+            wordViewModel: WordViewModel,
+            danny117BluetoothRepository: Danny117BluetoothRepository
+        ) {
+            fun btUpdate(w: Word) {
+                w.mode = spinner.selectedItemPosition
+                w.word = wordItemView.text.toString()
+                w.checked = wordItemSwitch.isChecked
+                w.color = Color.argb(
+                    sbAlpha.progress,
+                    sbRed.progress,
+                    sbGreen.progress,
+                    sbBlue.progress
+                )
+                sample.setBackgroundColor(w.color)
+                setTVSync()   //check if matches
+                scope.launch {
+                    wordViewModel.update(w)
+                    danny117BluetoothRepository.writeB(w)
                 }
             }
 
+            fun getListener() =
+                object : SeekBar.OnSeekBarChangeListener {
+                    /*changes to screen are done immediately here*/
+                    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                        val color = Color.argb(
+                            sbAlpha.progress,
+                            sbRed.progress,
+                            sbGreen.progress,
+                            sbBlue.progress
+                        )
+                        sample.setBackgroundColor(color)
+                    }
+
+                    override fun onStartTrackingTouch(p0: SeekBar?) {}
+
+                    /* when finished then send update to database*/
+                    override fun onStopTrackingTouch(p0: SeekBar?) {
+                        btUpdate(word)
+                    }
+                }
+
             this.word = word
-            wordItemView.setText(word.word, TextView.BufferType.EDITABLE)
+            val ws = word.word
+            wordItemView.setText(ws, TextView.BufferType.EDITABLE)
             wordItemView.isEnabled = false
             wordItemView.setOnEditorActionListener() { textView: TextView, i: Int, keyEvent: KeyEvent ->
                 when (i) {
                     EditorInfo.IME_ACTION_DONE -> {
-                        if (!textView.text.toString().equals(word.word)) {
-                            scope.launch {
-                                wordViewModel.update(word)
-                            }
-                            danny117BluetoothRepository.writeB(word)
-                        }
-                        true
+                        btUpdate(word)
                     }
-                else -> false
+                    //else -> false
                 }
+                when (keyEvent.action) {
+                    KeyEvent.KEYCODE_ENTER -> {
+                        btUpdate(word)
+                    }
+                }
+                false
             }
             wordItemSwitch.isChecked = word.checked
             wordItemSwitch.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
-                word.checked = b
-                setTVSync()
-                scope.launch {
-                    wordViewModel.update(word)
-                }
-                danny117BluetoothRepository.writeB(word)
+                btUpdate(word)
             }
             swControls.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
                 doChange(b)
-                val t = wordItemView.text.toString()
-                if (t != null) {
-                    if (!t.equals(word.word)) {
-                        word.word = t
-                        scope.launch {
-                            wordViewModel.update(word)
-                        }
-                        danny117BluetoothRepository.writeB(word)
-                    }
-                }
             }
             doChange(swControls.isChecked)
             sbRed.progress = Color.red(word.color)
             sbGreen.progress = Color.green(word.color)
             sbBlue.progress = Color.blue(word.color)
             sbAlpha.progress = Color.alpha(word.color)
-            sbRed.setOnSeekBarChangeListener(getListener(wordViewModel))
-            sbGreen.setOnSeekBarChangeListener(getListener(wordViewModel))
-            sbBlue.setOnSeekBarChangeListener(getListener(wordViewModel))
-            sbAlpha.setOnSeekBarChangeListener(getListener(wordViewModel))
+            sbRed.setOnSeekBarChangeListener(getListener())
+            sbGreen.setOnSeekBarChangeListener(getListener())
+            sbBlue.setOnSeekBarChangeListener(getListener())
+            sbAlpha.setOnSeekBarChangeListener(getListener())
             setTVSync()
+            sample.setBackgroundColor(word.color)
+            spinner.adapter = adapter
+            spinner.setSelection(word.mode)
+            spinner.onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    if (word.mode != p2) {
+                        btUpdate(word)
+                    }
+                }
 
+                override fun onNothingSelected(p0: AdapterView<*>?) {
 
-
+                }
+            }
         }
 
 
@@ -187,7 +213,8 @@ class WordListAdapter2(private var wordViewModel: WordViewModel,private val dann
                     && oldItem.word == newItem.word
                     && oldItem.color == newItem.color
                     && oldItem.recolor == newItem.recolor
-                    && oldItem.rechecked == newItem.rechecked)
+                    && oldItem.rechecked == newItem.rechecked
+                    && oldItem.remode == newItem.remode)
         }
     }
 

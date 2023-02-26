@@ -18,10 +18,13 @@ data class Bluetooth(
 @Entity(tableName = "word_table")
 data class Word(
     @ColumnInfo(name = "word") var word: String,
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") val _id: Int = 0,
+    @PrimaryKey() @ColumnInfo(name = "_id") var _id: Int = 0,
     @ColumnInfo(name = "color", defaultValue = "0") var color: Int = 0,
     @ColumnInfo(name = "checked", defaultValue = "false") var checked: Boolean = false,
     @ColumnInfo(name = "recolor", defaultValue = "0") var recolor: Int = 0,
     @ColumnInfo(name = "rechecked", defaultValue = "false") var rechecked: Boolean = false
+    ,@ColumnInfo(name = "mode", defaultValue = "0") var mode: Int = 0
+    ,@ColumnInfo(name = "remode", defaultValue = "0") var remode: Int = 0
 )
+
 

@@ -10,6 +10,8 @@ class WordViewModel(private val repository: WordRepository) : ViewModel() {
     // - Repository is completely separated from the UI through the ViewModel.
     val allWords: LiveData<List<Word>> = repository.allWords.asLiveData()
 
+    suspend fun getLightCount(): Int = repository.numLights()
+
     suspend fun insert(word: Word) {
         repository.insert(word)
     }

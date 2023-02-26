@@ -16,19 +16,11 @@ import java.util.*
 class Danny117BluetoothRepository(
     private val context: Context, private val wordViewModel: WordViewModel
 ) {
-    val myaddress = "98:D3:31:90:1E:1D"  // I know but I have to get the proof of concept done
+    //private val myAddress = "98:D3:31:90:1E:1D"  // I know but I have to get the proof of concept done
     private val MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb")
     private val appC: Context = context
     private var danny117BTSocket: BluetoothSocket? = null
-    private val newline = 10.toByte()
-
-
-    private fun read4BytesFromBuffer(buffer: ByteArray, offset: Int): Int {
-        return (buffer[offset].toInt() shl 24) or
-                (buffer[offset + 1].toInt() and 0xff shl 16) or
-                (buffer[offset + 2].toInt() and 0xff shl 8) or
-                (buffer[offset + 3].toInt() and 0xff)
-    }
+    val rev = ByteArray(256)
 
     //receive from bluetooth then update then database
     //the updated value in database will flow where it needs to go :)
@@ -40,14 +32,7 @@ class Danny117BluetoothRepository(
             val bx = getMyInputStream()
             if (bx != null) {
                 var cx = 0
-                while (cx != -1) {
-                    //buffer out of alignment
-                    if (cx == 16) {
-                        // find the markers and start over
-                        cx = 0
-                        offset = 0
-                        length = 16
-                    }
+                while (true) {
                     //normal multi read
                     if (cx in 1..15) {
                         length = 16 - cx
@@ -83,7 +68,7 @@ class Danny117BluetoothRepository(
                     // byte 9 color red
                     // byte 10 color green
                     // byte 11 color blue
-                    // byte 12 modes
+                    // byte 12 mode
                     // byte 13 marker 232
                     // byte 14 marker 34
                     // byte 15 marker 182
@@ -91,6 +76,12 @@ class Danny117BluetoothRepository(
                         && byteArray[0].toUByte() == 232.toUByte()
                         && byteArray[1].toUByte() == 34.toUByte()
                         && byteArray[2].toUByte() == 182.toUByte()
+                        && byteArray[3].toUByte() == 0.toUByte()
+                        && byteArray[4].toUByte() == 0.toUByte()
+                        && byteArray[5].toUByte() <= 32.toUByte()
+                        && byteArray[5].toUByte() >= 0.toUByte()
+                        && byteArray[6].toUByte() <= 32.toUByte()
+                        && byteArray[6].toUByte() >= 0.toUByte()
                         && byteArray[13].toUByte() == 232.toUByte()
                         && byteArray[14].toUByte() == 34.toUByte()
                         && byteArray[15].toUByte() == 182.toUByte()
@@ -98,18 +89,43 @@ class Danny117BluetoothRepository(
                         cx = 0
                         offset = 0
                         length = 16
-                        val i = read4BytesFromBuffer(byteArray, 3)
+                        val i = byteArray[6].toInt()
                         val w: Word = wordViewModel.getWord(i)
-                        if (w._id != 0) {
+                        if (w != null) {
                             w.rechecked = (byteArray[7].toInt() != 0)
                             w.recolor = Color.argb(
-                                byteArray[8].toUByte().toInt(),
+                                rev[byteArray[8].toUByte().toInt()].toUByte().toInt(),
                                 byteArray[9].toUByte().toInt(),
                                 byteArray[10].toUByte().toInt(),
                                 byteArray[11].toUByte().toInt()
                             )
+                            w.remode = byteArray[12].toUByte().toInt()
                             //finally update the word
                             wordViewModel.update(w)
+                        }
+                    }
+                    if (cx == 16) {
+                        //this has only fired when I forced it fire??? pretty stable
+                        //buffer out of alignment 16 bytes but they
+                        //didn't get past the check
+                        //something simple
+                        //move the array up one position so one more byte can be read
+                        //eventually it will find its way back
+                        // move the array back 1 position and read another byte on
+                        //next loop
+                        var n = false
+                        for (j: Int in 0..14) {
+                            byteArray[j] = byteArray[j + 1]
+                            if (
+                                byteArray[j].toUByte() != 0.toUByte()
+                            ) {
+                                n = true
+                            }
+                        }
+                        if (n) {
+                            cx = 15   //this only fired when I forced it fire
+                        } else {
+                            cx = 16
                         }
                     }
                 }
@@ -139,13 +155,18 @@ class Danny117BluetoothRepository(
         val bluetoothManager: BluetoothManager =
             context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         if (danny117BTSocket == null) {
+            var i = 255
+            for (k in 0..255){
+                rev[k] = i.toByte()
+                i--
+            }
             if (checkSelfPermission(
                     appC, android.Manifest.permission.BLUETOOTH_CONNECT
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
                 val ada = bluetoothManager.adapter
                 ada.bondedDevices.forEach {
-                    if (it.address == myaddress) {
+                    if (it.name=="Danny117HDWS2812B") {
                         danny117BTSocket = it.createRfcommSocketToServiceRecord(MY_UUID)
                     }
                 }
@@ -170,22 +191,16 @@ class Danny117BluetoothRepository(
                 danny117BTSocket = null
             }
         }
-
         return danny117BTSocket
     }
-
-    internal fun UInt.to4ByteArrayInBigEndian(): ByteArray =
-        (3 downTo 0).map {
-            (this shr (it * Byte.SIZE_BITS)).toByte()
-        }.toByteArray()
-
 
     fun writeB(word: Word) {
         if (danny117BTSocket != null) {
             CoroutineScope(Dispatchers.IO).launch {
+
                 val b = "writeB:" + Thread.currentThread().name
                 Log.d("DANNY117", b)
-                val outS = ByteArray(17)
+                val outS = ByteArray(16)
                 // 16 bytes
                 // byte 0 marker 232
                 // byte 1 marker 34
@@ -199,33 +214,34 @@ class Danny117BluetoothRepository(
                 // byte 9 color red
                 // byte 10 color green
                 // byte 11 color blue
-                // byte 12 modes
-                // byte 13 marker 232
-                // byte 14 marker 34
-                // byte 15 marker 182
+                // byte 12 mode
+                // byte 14 marker 232
+                // byte 15 marker 34
+                // byte 16 marker 182
                 outS[0] = 232.toByte()
                 outS[1] = 34.toByte()
                 outS[2] = 182.toByte()
-                //actually only need 2 bytes here
-                val ba = word._id.toUInt().to4ByteArrayInBigEndian()
-                outS[3] = ba[0]
-                outS[4] = ba[1]
-                outS[5] = ba[2]
-                outS[6] = ba[3]
+                outS[3] = 0.toByte()
+                outS[4] = 0.toByte()
+                outS[5] = 0.toByte()
+                //actually only need 1 byte here but
+                //the three zeros are nice as markers
+                //from id range is 1 to 32 so I don't need
+                //to actually send the whole id
+                outS[6] = word._id.toByte()
                 if (word.checked) {
                     outS[7] = 255.toByte()
                 } else {
                     outS[7] = 0.toByte()
                 }
-                outS[8] = Color.alpha(word.color).toByte()
+                outS[8] = rev[Color.alpha(word.color)]
                 outS[9] = Color.red(word.color).toByte()
                 outS[10] = Color.green(word.color).toByte()
                 outS[11] = Color.blue(word.color).toByte()
-                outS[12] = 0.toByte()
+                outS[12] = word.mode.toByte()
                 outS[13] = 232.toByte()
                 outS[14] = 34.toByte()
                 outS[15] = 182.toByte()
-                outS[16] = newline
                 val os = getMyOutputStream()
                 if (os != null) {
                     os.write(outS)
