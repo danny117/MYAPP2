@@ -49,8 +49,10 @@ class WordListAdapter2(
         val sbGreen: SeekBar = itemView.findViewById(R.id.sbGreen)
         val sbBlue: SeekBar = itemView.findViewById(R.id.sbBlue)
         val sbAlpha: SeekBar = itemView.findViewById(R.id.sbAlpha)
+        val sbAdj1: SeekBar = itemView.findViewById(R.id.sbAdj1)
+        val sbAdj2: SeekBar = itemView.findViewById(R.id.sbAdj2)
         val sample: TextView = itemView.findViewById(R.id.textView2)
-        private var items: Array<String> = arrayOf("Normal", "Blink 1000", "Blink 750", "Blink 500", "Blink 250", "Blink 3", "Marquee 1")
+        private var items: Array<String> = arrayOf("Normal", "Blink 1000", "Blink 750", "Blink 500", "Blink 250", "Blink 3", "Marquee Off", "Marquee On", "Marquee Adjustable")
         private var adapter: ArrayAdapter<String> =
             ArrayAdapter<String>(
                 itemView.context,
@@ -63,7 +65,12 @@ class WordListAdapter2(
         private val tvSync: TextView = itemView.findViewById(R.id.Update)
 
         private fun setTVSync(): Boolean {
-            if (word.color == word.recolor && word.checked == word.rechecked && word.mode == word.remode) {
+            if (word.color == word.recolor
+                && word.checked == word.rechecked
+                && word.mode == word.remode
+                && word.adj1 == word.readj1
+                && word.adj2 == word.readj2
+            ) {
                 tvSync.text = ""
                 tvSync.visibility = View.INVISIBLE
                 return true
@@ -83,6 +90,9 @@ class WordListAdapter2(
                 sbGreen.visibility = View.VISIBLE
                 sbBlue.visibility = View.VISIBLE
                 sbAlpha.visibility = View.VISIBLE
+                sbAdj1.visibility = View.VISIBLE
+                sbAdj2.visibility = View.VISIBLE
+
                 spinner.visibility = View.VISIBLE
             } else {
                 wordItemView.isEnabled = false
@@ -90,6 +100,8 @@ class WordListAdapter2(
                 sbGreen.visibility = View.GONE
                 sbBlue.visibility = View.GONE
                 sbAlpha.visibility = View.GONE
+                sbAdj1.visibility = View.GONE
+                sbAdj2.visibility = View.GONE
                 spinner.visibility = View.GONE
             }
         }
@@ -101,6 +113,8 @@ class WordListAdapter2(
             danny117BluetoothRepository: Danny117BluetoothRepository
         ) {
             fun btUpdate(w: Word) {
+                w.adj1 = sbAdj1.progress
+                w.adj2 = sbAdj2.progress
                 w.mode = spinner.selectedItemPosition
                 w.word = wordItemView.text.toString()
                 w.checked = wordItemSwitch.isChecked
@@ -110,6 +124,8 @@ class WordListAdapter2(
                     sbGreen.progress,
                     sbBlue.progress
                 )
+                w.adj1 = sbAdj1.progress
+                w.adj2 = sbAdj2.progress
                 sample.setBackgroundColor(w.color)
                 setTVSync()   //check if matches
                 scope.launch {
@@ -169,10 +185,14 @@ class WordListAdapter2(
             sbGreen.progress = Color.green(word.color)
             sbBlue.progress = Color.blue(word.color)
             sbAlpha.progress = Color.alpha(word.color)
+            sbAdj1.progress = word.adj1
+            sbAdj2.progress = word.adj2
             sbRed.setOnSeekBarChangeListener(getListener())
             sbGreen.setOnSeekBarChangeListener(getListener())
             sbBlue.setOnSeekBarChangeListener(getListener())
             sbAlpha.setOnSeekBarChangeListener(getListener())
+            sbAdj1.setOnSeekBarChangeListener(getListener())
+            sbAdj2.setOnSeekBarChangeListener(getListener())
             setTVSync()
             sample.setBackgroundColor(word.color)
             spinner.adapter = adapter
@@ -214,7 +234,12 @@ class WordListAdapter2(
                     && oldItem.color == newItem.color
                     && oldItem.recolor == newItem.recolor
                     && oldItem.rechecked == newItem.rechecked
-                    && oldItem.remode == newItem.remode)
+                    && oldItem.remode == newItem.remode
+                    && oldItem.readj1 == newItem.readj1
+                    && oldItem.readj2 == newItem.readj2
+                    && oldItem.adj1 == newItem.adj1
+                    && oldItem.adj2 == newItem.adj2
+                    )
         }
     }
 

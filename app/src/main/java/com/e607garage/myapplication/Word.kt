@@ -25,6 +25,12 @@ data class Word(
     @ColumnInfo(name = "rechecked", defaultValue = "false") var rechecked: Boolean = false
     ,@ColumnInfo(name = "mode", defaultValue = "0") var mode: Int = 0
     ,@ColumnInfo(name = "remode", defaultValue = "0") var remode: Int = 0
+    ,@ColumnInfo(name = "adj1", defaultValue = "0") var adj1: Int = 0
+    ,@ColumnInfo(name = "readj1", defaultValue = "0") var readj1: Int = 0
+    ,@ColumnInfo(name = "adj2", defaultValue = "0") var adj2: Int = 0
+    ,@ColumnInfo(name = "readj2", defaultValue = "0") var readj2: Int = 0
+
+
 )
 
 

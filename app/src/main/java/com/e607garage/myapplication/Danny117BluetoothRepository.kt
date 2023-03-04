@@ -26,16 +26,16 @@ class Danny117BluetoothRepository(
     //the updated value in database will flow where it needs to go :)
     fun fetchLatestReply() {
         CoroutineScope(Dispatchers.IO).launch {
-            val byteArray = ByteArray(16)
+            val byteArray = ByteArray(18)
             var offset = 0
-            var length = 16
+            var length = 18
             val bx = getMyInputStream()
             if (bx != null) {
                 var cx = 0
                 while (true) {
                     //normal multi read
-                    if (cx in 1..15) {
-                        length = 16 - cx
+                    if (cx in 1..17) {
+                        length = 18 - cx
                         offset = cx
                     }
                     try {
@@ -45,9 +45,6 @@ class Danny117BluetoothRepository(
                         Log.e("DANNY117", offset.toString())
                         Log.e("DANNY117", length.toString())
                         Log.e("DANNY117", cx.toString())
-                        length = 16
-                        offset = 0
-                        cx = 0
                     }
                     //get out of here
                     if (cx == -1) {
@@ -55,7 +52,7 @@ class Danny117BluetoothRepository(
                     }
                     cx += offset
                     //simple is it my data or garbage
-                    // 16 bytes
+                    // 18 bytes
                     // byte 0 marker 232
                     // byte 1 marker 34
                     // byte 2 marker 182
@@ -69,10 +66,12 @@ class Danny117BluetoothRepository(
                     // byte 10 color green
                     // byte 11 color blue
                     // byte 12 mode
-                    // byte 13 marker 232
-                    // byte 14 marker 34
-                    // byte 15 marker 182
-                    if (cx == 16
+                    // byte 13 adj1
+                    // byte 14 adj2
+                    // byte 15 marker 232
+                    // byte 16 marker 34
+                    // byte 17 marker 182
+                    if (cx == 18
                         && byteArray[0].toUByte() == 232.toUByte()
                         && byteArray[1].toUByte() == 34.toUByte()
                         && byteArray[2].toUByte() == 182.toUByte()
@@ -82,13 +81,13 @@ class Danny117BluetoothRepository(
                         && byteArray[5].toUByte() >= 0.toUByte()
                         && byteArray[6].toUByte() <= 32.toUByte()
                         && byteArray[6].toUByte() >= 0.toUByte()
-                        && byteArray[13].toUByte() == 232.toUByte()
-                        && byteArray[14].toUByte() == 34.toUByte()
-                        && byteArray[15].toUByte() == 182.toUByte()
+                        && byteArray[15].toUByte() == 232.toUByte()
+                        && byteArray[16].toUByte() == 34.toUByte()
+                        && byteArray[17].toUByte() == 182.toUByte()
                     ) {
                         cx = 0
                         offset = 0
-                        length = 16
+                        length = 18
                         val i = byteArray[6].toInt()
                         val w: Word = wordViewModel.getWord(i)
                         if (w != null) {
@@ -100,13 +99,15 @@ class Danny117BluetoothRepository(
                                 byteArray[11].toUByte().toInt()
                             )
                             w.remode = byteArray[12].toUByte().toInt()
+                            w.readj1 = byteArray[13].toUByte().toInt()
+                            w.readj2 = byteArray[14].toUByte().toInt()
                             //finally update the word
                             wordViewModel.update(w)
                         }
                     }
-                    if (cx == 16) {
+                    if (cx == 17) {
                         //this has only fired when I forced it fire??? pretty stable
-                        //buffer out of alignment 16 bytes but they
+                        //buffer out of alignment 18 bytes but they
                         //didn't get past the check
                         //something simple
                         //move the array up one position so one more byte can be read
@@ -123,9 +124,9 @@ class Danny117BluetoothRepository(
                             }
                         }
                         if (n) {
-                            cx = 15   //this only fired when I forced it fire
+                            cx = 17   //this only fired when I forced it fire
                         } else {
-                            cx = 16
+                            cx = 18
                         }
                     }
                 }
@@ -200,8 +201,8 @@ class Danny117BluetoothRepository(
 
                 val b = "writeB:" + Thread.currentThread().name
                 Log.d("DANNY117", b)
-                val outS = ByteArray(16)
-                // 16 bytes
+                val outS = ByteArray(18)
+                // 18 bytes
                 // byte 0 marker 232
                 // byte 1 marker 34
                 // byte 2 marker 182
@@ -215,9 +216,11 @@ class Danny117BluetoothRepository(
                 // byte 10 color green
                 // byte 11 color blue
                 // byte 12 mode
-                // byte 14 marker 232
-                // byte 15 marker 34
-                // byte 16 marker 182
+                // byte 13 adj1
+                // byte 14 adj2
+                // byte 15 marker 232
+                // byte 16 marker 34
+                // byte 17 marker 182
                 outS[0] = 232.toByte()
                 outS[1] = 34.toByte()
                 outS[2] = 182.toByte()
@@ -239,9 +242,11 @@ class Danny117BluetoothRepository(
                 outS[10] = Color.green(word.color).toByte()
                 outS[11] = Color.blue(word.color).toByte()
                 outS[12] = word.mode.toByte()
-                outS[13] = 232.toByte()
-                outS[14] = 34.toByte()
-                outS[15] = 182.toByte()
+                outS[13] = word.adj1.toByte()
+                outS[14] = word.adj2.toByte()
+                outS[15] = 232.toByte()
+                outS[16] = 34.toByte()
+                outS[17] = 182.toByte()
                 val os = getMyOutputStream()
                 if (os != null) {
                     os.write(outS)

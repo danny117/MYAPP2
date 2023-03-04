@@ -148,7 +148,29 @@
         app:layout_constraintTop_toBottomOf="@id/sbBlue"
         tools:layout_editor_absoluteX="48dp" />
 
+    <SeekBar
+        android:id="@+id/sbAdj1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="@integer/max255"
+        android:progressTint="#9C27B0"
+        android:thumbTint="#9C27B0"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sbAlpha"
+        tools:layout_editor_absoluteX="48dp" />
 
+    <SeekBar
+        android:id="@+id/sbAdj2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="@integer/max255"
+        android:progressTint="#E91E63"
+        android:thumbTint="#E91E63"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sbAdj1"
+        tools:layout_editor_absoluteX="48dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
